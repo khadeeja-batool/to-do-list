@@ -16,3 +16,6 @@ to-do-list/
 ├── index.html
 ├── style.css
 └── README.md
+
+##  Clone this repository:
+git clone https://github.com/khadeeja-batool/to-do-list.git
