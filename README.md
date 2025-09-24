@@ -15,5 +15,4 @@ A responsive and feature-rich To-Do List web application with tasks, subtasks, d
 to-do-list/
 ├── index.html
 ├── style.css
-├── script.js
 └── README.md
