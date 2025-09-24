@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <title>Professional To-Do List</title>
+  <style>
+    /* optional: preserve formatting in CSS too */
+    .task-desc {
+      white-space: pre-wrap;
+      margin-top: 5px;
+    }
+    .task-card {
+      border: 2px solid #4CAF50;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+
+<h1>My To-Do List</h1>
+
+<div class="container">
+  <!-- Add Task Form -->
+  <div class="add-task">
+    <input type="text" id="taskTitle" placeholder="Task Title">
+    <textarea id="taskDesc" placeholder="Task Description (type each point on a new line)"></textarea>
+    <input type="date" id="taskDeadline">
+    <button id="addTaskBtn">+ Add Task</button>
+  </div>
+
+  <!-- Task List -->
+  <div class="task-grid" id="taskGrid"></div>
+</div>
+<script>
+  let tasks = [];
+
+  const taskTitle=document.getElementById('taskTitle');
+  const taskDesc=document.getElementById('taskDesc');
+  const taskDeadline=document.getElementById('taskDeadline');
+  const addTaskBtn=document.getElementById('addTaskBtn');
+  const taskGrid=document.getElementById('taskGrid');
+
+  addTaskBtn.addEventListener('click', addTask);
+
+  function addTask(){
+    if(!taskTitle.value.trim()) return;
+    tasks.push({
+      title:taskTitle.value,
+      desc:taskDesc.value,
+      created:new Date().toLocaleDateString(),
+      deadline:taskDeadline.value,
+      completed:false,
+      showDetails:false,
+      subtasks:[]
+    });
+    taskTitle.value='';taskDesc.value='';taskDeadline.value='';
+    renderTasks();
+  }
+
+  function renderTasks(){
+    taskGrid.innerHTML='';
+    tasks.forEach((task,i)=>{
+      taskGrid.append(createTaskCard(task,i));
+    });
+  }
+
+  function createTaskCard(task,i,parentIndex=null){
+    const card=document.createElement('div');
+    card.className='task-card';
+
+    const titleRow=document.createElement('div');
+    titleRow.className='task-title';
+
+    const left=document.createElement('div');
+    const cb=document.createElement('input');
+    cb.type='checkbox'; cb.checked=task.completed;
+    cb.onchange=()=> parentIndex===null? toggleTask(i):toggleSubtask(parentIndex,i);
+
+    const title=document.createElement('span');
+    title.textContent=task.title;
+    if(task.completed) title.classList.add('completed');
+
+    left.append(cb,title);
+
+    const eye=document.createElement('button');
+    eye.className='eye-btn';
+    eye.innerHTML=task.showDetails?'👁️':'👁️‍🗨️';
+    eye.onclick=()=> parentIndex===null? toggleDetails(i):toggleSubDetails(parentIndex,i);
+
+    titleRow.append(left,eye);
+
+    const details=document.createElement('div');
+    details.className='task-details';
+    if(task.showDetails) details.style.display='block';
+
+    // Description with same format as user entered
+    if(task.desc){
+      const desc=document.createElement('div');
+      desc.className='task-desc';
+      // convert \n to <br> so new lines appear
+      desc.innerHTML=task.desc.replace(/\n/g,'<br>');
+      details.append(desc);
+    }
+
+    const info=document.createElement('div');
+    info.className='task-info';
+    info.textContent=`Created: ${task.created}${task.deadline? " | Deadline: "+task.deadline:""}`;
+    details.append(info);
+
+    const actions=document.createElement('div');
+    actions.className='task-actions';
+    const edit=document.createElement('button');
+    edit.textContent='Edit';
+    edit.onclick=()=> parentIndex===null? editTask(i):editSubtask(parentIndex,i);
+    const del=document.createElement('button');
+    del.textContent='Delete';
+    del.onclick=()=> parentIndex===null? deleteTask(i):deleteSubtask(parentIndex,i);
+    actions.append(edit,del);
+    details.append(actions);
+
+    if(parentIndex===null){
+      const subInputs=document.createElement('div');
+      subInputs.className='subtask-inputs';
+      const stTitle=document.createElement('input');
+      stTitle.placeholder='Subtask Title';
+      const stDesc=document.createElement('textarea');
+      stDesc.placeholder='Subtask Description (type each point on a new line)';
+      const stDeadline=document.createElement('input');
+      stDeadline.type='date';
+      const stBtn=document.createElement('button');
+      stBtn.textContent='Add Subtask';
+      stBtn.onclick=()=>{
+        addSubtask(i,stTitle.value,stDesc.value,stDeadline.value);
+        stTitle.value=''; stDesc.value=''; stDeadline.value='';
+      };
+      subInputs.append(stTitle,stDesc,stDeadline,stBtn);
+
+      const subList=document.createElement('div');
+      subList.className='subtask-list';
+      task.subtasks.forEach((st,j)=> subList.append(createTaskCard(st,j,i)));
+
+      details.append(subInputs,subList);
+    }
+
+    card.append(titleRow,details);
+    return card;
+  }
+
+  function toggleDetails(i){tasks[i].showDetails=!tasks[i].showDetails;renderTasks();}
+  function toggleTask(i){tasks[i].completed=!tasks[i].completed;renderTasks();}
+  function editTask(i){
+    const t=prompt("Edit title:",tasks[i].title);
+    const d=prompt("Edit description:",tasks[i].desc);
+    const dl=prompt("Edit deadline:",tasks[i].deadline);
+    if(t!==null) tasks[i].title=t;
+    if(d!==null) tasks[i].desc=d;
+    if(dl!==null) tasks[i].deadline=dl;
+    renderTasks();
+  }
+  function deleteTask(i){tasks.splice(i,1);renderTasks();}
+
+  // Subtasks
+  function addSubtask(i,title,desc,deadline){
+    if(!title.trim())return;
+    tasks[i].subtasks.push({
+      title,desc,deadline,
+      created:new Date().toLocaleDateString(),
+      completed:false,showDetails:false
+    });
+    renderTasks();
+  }
+  function toggleSubtask(i,j){tasks[i].subtasks[j].completed=!tasks[i].subtasks[j].completed;renderTasks();}
+  function editSubtask(i,j){
+    const st=tasks[i].subtasks[j];
+    const t=prompt("Edit subtask title:",st.title);
+    const d=prompt("Edit subtask description:",st.desc);
+    const dl=prompt("Edit subtask deadline:",st.deadline);
+    if(t!==null) st.title=t;
+    if(d!==null) st.desc=d;
+    if(dl!==null) st.deadline=dl;
+    renderTasks();
+  }
+  function deleteSubtask(i,j){tasks[i].subtasks.splice(j,1);renderTasks();}
+  function toggleSubDetails(i,j){tasks[i].subtasks[j].showDetails=!tasks[i].subtasks[j].showDetails;renderTasks();}
+</script>
+
+</body>
+</html>
