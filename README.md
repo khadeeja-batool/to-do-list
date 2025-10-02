@@ -13,7 +13,7 @@ Responsive grid layout with up to 3 tasks per row for a clean and organized view
 
 Prevent duplicate titles for tasks and subtasks (case-insensitive).
 
-Enforce mandatory titles — blank or space-only inputs are not allowed.
+Enforce mandatory titles blank or space-only inputs are not allowed.
 
 Allow optional descriptions, with extra spaces automatically trimmed.
 
