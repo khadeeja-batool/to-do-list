@@ -36,13 +36,13 @@ function addTask(){
   if(taskDeadline.value){
     const deadlineDate = new Date(taskDeadline.value);
 
-    // ❌ Past check
+    // Past check
     if(deadlineDate.getTime() < Date.now()){
       alert("Deadline cannot be in the past!");
       return;
     }
 
-    // ✅ At least 1 hr from creation
+    // At least 1 hr from creation
     if(deadlineDate.getTime() < (createdDate.getTime() + 60*60*1000)){
       alert("Deadline must be at least 1 hour later than creation time.");
       return;
@@ -52,7 +52,7 @@ function addTask(){
   tasks.push({
     title:taskTitle.value.trim(),
     desc:taskDesc.value.trim() || "",   // empty spaces ignored
-    created:createdDate.toISOString(),   // ✅ ISO format
+    created:createdDate.toISOString(),   // ISO format
     deadline:taskDeadline.value || '',
     completed:false,
     showDetails:false,
@@ -72,7 +72,7 @@ function renderTasks(){
   });
 }
 
-// 🔹 Create Task Card
+// Create Task Card
 function createTaskCard(task,i,parentIndex=null){
   const card=document.createElement('div');
   card.className='task-card';
@@ -106,7 +106,7 @@ function createTaskCard(task,i,parentIndex=null){
   details.className='task-details';
   if(task.showDetails) details.style.display='block';
 
-  // 🔹 Editing Mode
+  // Editing Mode
   if(task.editing){
     if(parentIndex===null) {
       details.append(createEditFormForTask(i));
@@ -119,7 +119,7 @@ function createTaskCard(task,i,parentIndex=null){
     }
   }
 
-  // 🔹 Description
+  // Description
   if(task.desc){
     const desc=document.createElement('div');
     desc.className='task-desc';
@@ -141,7 +141,7 @@ function createTaskCard(task,i,parentIndex=null){
   info.textContent = infoText;
   details.append(info);
 
-  // 🔹 Actions
+  // Actions
   const actions=document.createElement('div');
   actions.className='task-actions';
   const edit=document.createElement('button');
@@ -153,7 +153,7 @@ function createTaskCard(task,i,parentIndex=null){
   actions.append(edit,del);
   details.append(actions);
 
-  // 🔹 Subtasks Section
+  // Subtasks Section
   if(parentIndex===null){
     const subInputs=document.createElement('div');
     subInputs.className='subtask-inputs';
@@ -191,7 +191,7 @@ function createTaskCard(task,i,parentIndex=null){
   return card;
 }
 
-// 🔹 Edit Task
+// Edit Task
 function startEditTask(i){ tasks[i].editing = true; renderTasks(); }
 function createEditFormForTask(i){
   const form=document.createElement('div');
@@ -243,12 +243,12 @@ function createEditFormForTask(i){
   return form;
 }
 
-// 🔹 Toggle & Delete Task
+// Toggle & Delete Task
 function toggleDetails(i){tasks[i].showDetails=!tasks[i].showDetails;saveTasks();renderTasks();}
 function toggleTask(i){tasks[i].completed=!tasks[i].completed;saveTasks();renderTasks();}
 function deleteTask(i){ if(confirm('Delete this task?')){tasks.splice(i,1);saveTasks();renderTasks();} }
 
-// 🔹 Add Subtask
+// Add Subtask
 function addSubtask(i,title,desc,deadline){
   if(!title || !title.trim()){ alert('Subtask title required'); return; }
 
@@ -284,7 +284,7 @@ function addSubtask(i,title,desc,deadline){
   renderTasks();
 }
 
-// 🔹 Edit Subtask
+// Edit Subtask
 function startEditSubtask(parentIdx, idx){
   tasks[parentIdx].subtasks[idx].editing = true; renderTasks();
 }
@@ -333,12 +333,12 @@ function createEditFormForSubtask(parentIdx, idx){
   return form;
 }
 
-// 🔹 Toggle & Delete Subtask
+// Toggle & Delete Subtask
 function toggleSubtask(i,j){tasks[i].subtasks[j].completed=!tasks[i].subtasks[j].completed;saveTasks();renderTasks();}
 function deleteSubtask(i,j){ if(confirm('Delete this subtask?')){tasks[i].subtasks.splice(j,1);saveTasks();renderTasks();} }
 function toggleSubDetails(i,j){tasks[i].subtasks[j].showDetails=!tasks[i].subtasks[j].showDetails;saveTasks();renderTasks();}
 
-// 🔹 Helpers
+// Helpers
 function formatLocal(dtString){ if(!dtString) return ''; const d=new Date(dtString); return d.toLocaleString(); }
 function escapeHtml(unsafe) { return unsafe
     .replace(/&/g, "&amp;")
@@ -347,5 +347,6 @@ function escapeHtml(unsafe) { return unsafe
     .replace(/\"/g, "&quot;")
     .replace(/\'/g, "&#039;"); }
 
-// 🔹 Initial render
+// Initial render
 renderTasks();
+
